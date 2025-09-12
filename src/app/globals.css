@@ -1,26 +1,454 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+        "Ubuntu", "Cantarell", "Open Sans", "Helvetica Neue", sans-serif;
+    background-color: #fdfbfc;
+    color: #000;
+}
+
+/* Brutal Design Utilities */
+.border-brutal {
+    border: 2px solid #000 !important;
+    border-radius: 0 !important;
+}
+
+.shadow-brutal {
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1) !important;
+}
+
+.shadow-brutal-sm {
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 1) !important;
+}
+
+.hover\:shadow-brutal-lg:hover {
+    box-shadow: 8px 8px 0px rgba(0, 0, 0, 1) !important;
+}
+
+/* Component Styles */
+.btn {
+    @apply border-2 border-black bg-white text-black px-4 py-2 font-bold cursor-pointer transition-all;
+    border-radius: 0;
+}
+
+.btn:hover {
+    @apply bg-gray-100;
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+}
+
+.btn:active {
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+    transform: translate(2px, 2px);
+}
+
+.btn-brutal {
+    @apply btn;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-brutal:hover {
+    box-shadow: 6px 6px 0px rgba(0, 0, 0, 1);
+}
+
+.select-brutal {
+    @apply border-2 border-black bg-white text-black px-3 py-2 font-bold cursor-pointer;
+    border-radius: 0;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.card {
+    @apply bg-white p-6;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.users-table {
+    @apply bg-white overflow-hidden;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.table-header {
+    @apply bg-gray-50 p-6 flex justify-between items-center;
+    border-bottom: 2px solid #000;
+}
+
+th,
+td {
+    @apply p-4 border-b border-gray-200 text-left text-black;
+}
+
+th {
+    @apply bg-gray-50 font-bold uppercase text-xs text-black tracking-wider;
+    border-bottom: 2px solid #000;
+}
+
+.user-row:hover {
+    @apply bg-gray-50;
+}
+
+.calendar {
+    @apply bg-white p-6 mb-6;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.calendar-grid {
+    @apply border border-black;
+}
+
+.calendar-weekdays {
+    @apply grid grid-cols-7 bg-gray-50;
+}
+
+.calendar-weekdays > div {
+    @apply p-3 border-r border-b border-black text-center font-bold;
+}
+
+.calendar-days {
+    @apply grid grid-cols-7;
+}
+
+.calendar-day {
+    @apply min-h-[100px] p-2 border-r border-b border-gray-200 flex flex-col justify-between cursor-pointer;
+}
+
+.calendar-day:hover {
+    @apply bg-gray-50;
+}
+
+.calendar-day.today {
+    @apply bg-blue-50;
+    border: 2px solid #3b82f6;
+}
+
+.calendar-day.holiday {
+    @apply bg-red-50;
+}
+
+.calendar-day.weekend {
+    @apply bg-gray-100;
+}
+
+.calendar-day.all-present {
+    @apply bg-green-100;
+}
+
+.calendar-day.mostly-present {
+    @apply bg-green-50;
+}
+
+.calendar-day.some-present {
+    @apply bg-yellow-50;
+}
+
+.calendar-day.mostly-absent {
+    @apply bg-red-50;
+}
+
+.legend-item {
+    @apply px-2 py-1 text-xs font-bold inline-block;
+    border: 1px solid #000;
+    border-radius: 0;
+}
+
+.legend-item.all-present {
+    @apply bg-green-100;
+}
+
+.legend-item.mostly-present {
+    @apply bg-green-50;
+}
+
+.legend-item.some-present {
+    @apply bg-yellow-50;
+}
+
+.legend-item.mostly-absent {
+    @apply bg-red-50;
+}
+
+.legend-item.holiday {
+    @apply bg-red-100;
+}
+
+.legend-item.weekend {
+    @apply bg-gray-100;
+}
+
+.modal {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4;
+}
+
+.modal-content {
+    @apply bg-white max-w-4xl max-h-[90vh] overflow-y-auto w-full;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
+}
+
+.modal-header {
+    @apply flex justify-between items-center p-6 bg-gray-50 sticky top-0 z-10;
+    border-bottom: 2px solid #000;
+}
+
+.status-badge,
+.project-tag {
+    @apply px-2 py-1 text-xs font-bold inline-block;
+    border: 1px solid #000;
+    border-radius: 0;
+}
+
+.loading,
+.error {
+    @apply text-center py-8 text-black;
+}
+
+.error {
+    @apply bg-red-50;
+    border: 1px solid #dc2626;
+}
+
+/* Dashboard specific styles */
+.dashboard-content {
+    @apply p-6;
+}
+
+.dashboard-filters {
+    @apply flex gap-4 mb-6 flex-wrap;
+}
+
+.loading-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #fdfbfc;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    border: 2px solid black;
+    background: white;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.error-message {
+    text-align: center;
+    padding: 2rem;
+    border: 2px solid red;
+    background: white;
+    color: red;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.stat-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 2px solid black;
+    display: inline-block;
+}
+
+.stat-badge.full-days {
+    background: #d4edda;
+    color: #155724;
+}
+
+.stat-badge.half-days {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.stat-badge.not-checked {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.stat-badge.total-days {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.manage-trips-btn {
+    background: white;
+    color: black;
+    border: 2px solid black;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 0.8rem;
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+    font-weight: bold;
+}
+
+.manage-trips-btn:hover {
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.view-btn {
+    background: black;
+    color: white;
+    border: 2px solid black;
+    padding: 0.5rem 1rem;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.view-btn:hover {
+    background: #333;
+}
+
+.date-attendance-details {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 0;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.date-attendance-details h3 {
+    color: black;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid black;
+    padding-bottom: 0.5rem;
+}
+
+.date-attendance-details ul {
+    list-style: none;
+    padding: 0;
+}
+
+.date-attendance-details li {
+    padding: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    color: black;
+}
+
+.user-row td {
+    padding: 1rem;
+    color: black;
+}
+
+.project-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.project-tag {
+    background: #e2e8f0;
+    color: black;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid black;
+}
+
+.monthly-stats {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.field-trip-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.modal-backdrop {
+    @apply fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-[1000] p-4;
+}
+
+.modal-container {
+    @apply bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
+}
+
+.modal-title {
+    @apply m-0 text-2xl text-gray-800;
+}
+
+.close-btn {
+    @apply bg-transparent border-none text-3xl leading-none text-gray-500 cursor-pointer transition-colors duration-200 hover:text-gray-800;
+}
+
+/* Calendar specific styles */
+.calendar-header {
+    @apply flex justify-between items-center mb-4 flex-wrap gap-4;
+}
+
+.calendar-legend {
+    @apply flex flex-wrap gap-2;
+}
+
+.day-number {
+    @apply font-bold text-sm;
+}
+
+.day-holiday {
+    @apply text-xs text-red-600 font-medium;
+}
+
+.day-attendance {
+    @apply text-xs bg-gray-200 px-1 py-0.5 mt-auto;
+    border: 1px solid #000;
+    border-radius: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .dashboard-content {
+        @apply p-4;
+    }
+
+    .table-header {
+        @apply flex-col gap-2;
+    }
+
+    table {
+        @apply text-sm;
+    }
+
+    th,
+    td {
+        @apply p-2;
+    }
+
+    .calendar-day {
+        @apply min-h-[80px];
+    }
+
+    .dashboard-filters {
+        @apply flex-col;
+    }
+
+    .calendar-header {
+        @apply flex-col items-start;
+    }
 }
