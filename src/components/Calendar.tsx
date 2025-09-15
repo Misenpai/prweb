@@ -162,7 +162,7 @@ export default function Calendar({
   return (
     <div className="calendar">
       <div className="calendar-header">
-        <h2 className="bg-black">
+        <h2>
           {new Date(year, month - 1).toLocaleDateString("en-US", {
             month: "long",
             year: "numeric",

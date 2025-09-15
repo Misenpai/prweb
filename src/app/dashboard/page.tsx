@@ -18,7 +18,9 @@ export default function Dashboard() {
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear(),
   });
-  const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined); // Changed to undefined
+  const [selectedDate, setSelectedDate] = useState<string | undefined>(
+    undefined,
+  );
   const [dateAttendances, setDateAttendances] = useState<any[]>([]);
 
   const loadData = useCallback(async () => {
@@ -51,17 +53,15 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [user, filters.month, filters.year]); // Added dependencies
+  }, [user, filters.month, filters.year]);
 
-  // Polling for updates
   useEffect(() => {
     const pollInterval = setInterval(() => {
       if (user) loadData();
-    }, 30000); // Poll every 30 seconds
+    }, 30000);
 
     return () => clearInterval(pollInterval);
-  }, [user, loadData]); // Added loadData to deps
-
+  }, [user, loadData]);
 
   const handleDateSelect = (date: string, attendances: any[]) => {
     setSelectedDate(date);
@@ -70,7 +70,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadData();
-  }, [loadData]); // Use loadData from useCallback
+  }, [loadData]);
 
   return (
     <div className="dashboard-content">
@@ -105,10 +105,10 @@ export default function Dashboard() {
         </button>
       </div>
 
-      <Calendar 
-        month={filters.month} 
-        year={filters.year} 
-        users={data?.data || []} 
+      <Calendar
+        month={filters.month}
+        year={filters.year}
+        users={data?.data || []}
         onDateClick={handleDateSelect}
       />
 

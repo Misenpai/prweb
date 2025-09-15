@@ -25,7 +25,7 @@ export default function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000); // Poll every 10 seconds
+    const interval = setInterval(fetchNotifications, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -55,19 +55,15 @@ export default function NotificationBell() {
         🔔
       </span>
       {notifications.length > 0 && (
-        <span className="absolute -top-1 -right-2.5 bg-black text-white rounded-full w-5 h-5 flex justify-center items-center text-xs font-bold">
-          {notifications.length}
-        </span>
+        <span className="notification-badge">{notifications.length}</span>
       )}
 
       {isOpen && (
-        <div className="absolute top-10 right-0 w-72 bg-white border-2 border-black rounded-none shadow-brutal z-[1000]">
-          <div className="p-4 font-bold border-b-2 border-black text-black">
-            HR Data Requests
-          </div>
+        <div className="notification-dropdown">
+          <div className="notification-header">HR Data Requests</div>
           {notifications.length > 0 ? (
             notifications.map((notif, index) => (
-              <div key={index} className="p-4 border-b border-gray-200">
+              <div key={index} className="notification-item">
                 <p className="mb-3 text-black">
                   Request for attendance data for:{" "}
                   <strong>
@@ -79,7 +75,7 @@ export default function NotificationBell() {
                   </strong>
                 </p>
                 <button
-                  className="py-1.5 px-3 bg-black text-white rounded-none cursor-pointer font-bold border-2 border-black"
+                  className="btn"
                   onClick={() => handleSendData(notif.month, notif.year)}
                 >
                   Send Data to HR
@@ -87,7 +83,7 @@ export default function NotificationBell() {
               </div>
             ))
           ) : (
-            <div className="p-6 text-center text-gray-500">No new requests</div>
+            <div className="notification-empty">No new requests</div>
           )}
         </div>
       )}

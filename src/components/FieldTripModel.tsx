@@ -118,8 +118,8 @@ export default function FieldTripModal({
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-          <div className="p-4 bg-gray-50 border border-black">
+        <div className="p-6">
+          <div className="field-trip-info mb-6">
             <p>
               <strong>Employee Number:</strong> {user.employeeNumber}
             </p>
@@ -132,32 +132,28 @@ export default function FieldTripModal({
           {loading ? (
             <p>Loading field trips…</p>
           ) : (
-            <>
-              <div className="p-4 border border-black space-y-4">
-                <h3 className="text-lg font-bold">Schedule New Field Trip</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col">
-                    <label htmlFor="startDate" className="mb-1 font-semibold">
-                      Start Date
-                    </label>
+            <div className="flex flex-col gap-6">
+              <div className="field-trip-form">
+                <h3 className="text-lg font-bold mb-4">
+                  Schedule New Field Trip
+                </h3>
+                <div className="form-row md:grid-cols-2 mb-4">
+                  <div className="form-group">
+                    <label htmlFor="startDate">Start Date</label>
                     <input
                       id="startDate"
                       type="date"
-                      className="p-2 border border-black"
                       value={newTrip.startDate}
                       onChange={(e) =>
                         setNewTrip({ ...newTrip, startDate: e.target.value })
                       }
                     />
                   </div>
-                  <div className="flex flex-col">
-                    <label htmlFor="endDate" className="mb-1 font-semibold">
-                      End Date
-                    </label>
+                  <div className="form-group">
+                    <label htmlFor="endDate">End Date</label>
                     <input
                       id="endDate"
                       type="date"
-                      className="p-2 border border-black"
                       value={newTrip.endDate}
                       min={newTrip.startDate}
                       onChange={(e) =>
@@ -166,14 +162,11 @@ export default function FieldTripModal({
                     />
                   </div>
                 </div>
-                <div className="flex flex-col">
-                  <label htmlFor="description" className="mb-1 font-semibold">
-                    Description (Optional)
-                  </label>
+                <div className="form-group mb-4">
+                  <label htmlFor="description">Description (Optional)</label>
                   <input
                     id="description"
                     type="text"
-                    className="p-2 border border-black"
                     value={newTrip.description}
                     onChange={(e) =>
                       setNewTrip({ ...newTrip, description: e.target.value })
@@ -186,37 +179,39 @@ export default function FieldTripModal({
                 </button>
               </div>
 
-              <div className="space-y-3">
-                <h3 className="text-lg font-bold">Scheduled Field Trips</h3>
+              <div>
+                <h3 className="text-lg font-bold mb-3">
+                  Scheduled Field Trips
+                </h3>
                 {fieldTrips.length === 0 ? (
-                  <p className="p-4 bg-gray-50 border border-black">
+                  <div className="field-trip-empty">
                     No field trips scheduled
-                  </p>
+                  </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="field-trip-list">
                     {fieldTrips.map((trip, index) => (
                       <div
                         key={index}
-                        className={`flex justify-between items-center p-3 border border-black ${isCurrentlyOnTrip(trip) ? "bg-blue-100" : "bg-white"}`}
+                        className={`field-trip-item ${isCurrentlyOnTrip(trip) ? "active" : ""}`}
                       >
-                        <div className="flex-grow">
-                          <span className="font-mono">
+                        <div className="field-trip-item-info">
+                          <span className="field-trip-item-date">
                             {new Date(trip.startDate).toLocaleDateString()} -{" "}
                             {new Date(trip.endDate).toLocaleDateString()}
                           </span>
                           {trip.description && (
-                            <span className="ml-4 text-gray-600 italic">
+                            <span className="field-trip-item-description">
                               {trip.description}
                             </span>
                           )}
                           {isCurrentlyOnTrip(trip) && (
-                            <span className="ml-4 px-2 py-1 text-xs font-bold text-white bg-blue-600">
+                            <span className="field-trip-item-status">
                               ACTIVE NOW
                             </span>
                           )}
                         </div>
                         <button
-                          className="px-3 py-1 bg-red-500 text-white font-bold border border-black hover:bg-red-600"
+                          className="field-trip-remove-btn"
                           onClick={() => handleRemoveTrip(index)}
                         >
                           Remove
@@ -227,7 +222,7 @@ export default function FieldTripModal({
                 )}
               </div>
 
-              <div className="flex justify-end items-center gap-4 pt-4 border-t-2 border-black">
+              <div className="form-actions">
                 <button className="btn bg-gray-200" onClick={onClose}>
                   Cancel
                 </button>
@@ -238,7 +233,7 @@ export default function FieldTripModal({
                   Save Field Trips
                 </button>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -48,7 +48,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="dashboard-layout bg-[#fdfbfc]">
+    <div className="dashboard-layout">
       <div className="main-content">
         <Header />
         {children}
