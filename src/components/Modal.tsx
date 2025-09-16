@@ -193,9 +193,7 @@ export default function Modal({
                         <div className="detail-item flex-1 min-w-[200px]">
                           <strong>Location:</strong>{" "}
                           <span>
-                            {att.location?.address ||
-                              att.takenLocation ||
-                              "Not specified"}
+                            {att.location?.address || "Not specified"}
                           </span>
                         </div>
                         <div className="detail-item flex-1 min-w-[200px]">
@@ -209,6 +207,12 @@ export default function Modal({
                           >
                             {att.isCheckedOut ? "Completed" : "In Progress"}
                           </span>
+                        </div>
+                      </div>
+                      <div className="detail-row flex justify-between flex-wrap gap-4">
+                        <div className="detail-item flex-1 min-w-[200px]">
+                          <strong>Taken Department Location:</strong>{" "}
+                          <span>{att.takenLocation || "Not specified"}</span>
                         </div>
                       </div>
                     </div>
