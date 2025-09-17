@@ -1,4 +1,3 @@
-// src/app/utils/api.ts
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
 export class ApiClient {
@@ -6,19 +5,18 @@ export class ApiClient {
     const token = localStorage.getItem("pi_token");
     const ssoUser = localStorage.getItem("sso_user");
 
-    let headers: any = {
+    const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
 
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     } else if (ssoUser) {
-      // For SSO, send the user data in headers with timestamp
       const userData = JSON.parse(ssoUser);
       const ssoData = {
         username: userData.username,
         projectCodes: userData.projects,
-        timestamp: Date.now(), // Add fresh timestamp
+        timestamp: Date.now(),
       };
       headers["X-SSO-User"] = JSON.stringify(ssoData);
     }
@@ -33,7 +31,7 @@ export class ApiClient {
     return response.json();
   }
 
-  async post(endpoint: string, data: any) {
+  async post(endpoint: string, data: unknown) {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method: "POST",
       headers: this.getHeaders(),
@@ -42,7 +40,7 @@ export class ApiClient {
     return response.json();
   }
 
-  async put(endpoint: string, data: any) {
+  async put(endpoint: string, data: unknown) {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method: "PUT",
       headers: this.getHeaders(),
@@ -51,12 +49,13 @@ export class ApiClient {
     return response.json();
   }
 
-  // Keep SSO method for specific endpoints
-  async postWithSSO(endpoint: string, data: any) {
+  async postWithSSO(endpoint: string, data: Record<string, unknown>) {
     const ssoUser = localStorage.getItem("sso_user");
+    let body = data;
+
     if (ssoUser) {
       const userData = JSON.parse(ssoUser);
-      data = {
+      body = {
         ...data,
         username: userData.username,
         projectCodes: userData.projects,
@@ -66,7 +65,7 @@ export class ApiClient {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method: "POST",
       headers: this.getHeaders(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
     });
     return response.json();
   }

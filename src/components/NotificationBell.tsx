@@ -45,6 +45,7 @@ export default function NotificationBell() {
         alert(`Error: ${res.error}`);
       }
     } catch (error) {
+      console.error("Failed to send data:", error);
       alert("Failed to send data. Please try again.");
     }
   };

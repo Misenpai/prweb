@@ -2,10 +2,16 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { api } from "../utils/api";
-import type { CalendarDay, User } from "../types";
+import type {
+  CalendarDay,
+  User,
+  Holiday,
+  Attendance,
+  CalendarAttendance,
+} from "../types";
 
-interface ExtendedAttendance {
-  username?: string;
+interface ExtendedAttendance extends Attendance {
+  username: string;
 }
 
 interface CalendarProps {
@@ -22,7 +28,6 @@ export default function Calendar({
   onDateClick,
 }: CalendarProps) {
   const [calendarData, setCalendarData] = useState<CalendarDay[]>([]);
-  const [holidays, setHolidays] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadCalendarData = useCallback(async () => {
@@ -30,42 +35,38 @@ export default function Calendar({
       setLoading(true);
 
       const holidaysRes = await api.get(`/calendar/holidays?year=${year}`);
-      const currentYearHolidays = holidaysRes.success
+      const currentYearHolidays: Holiday[] = holidaysRes.success
         ? holidaysRes.holidays
         : [];
-      setHolidays(currentYearHolidays);
 
       const daysInMonth = new Date(year, month, 0).getDate();
       const calendarDays: CalendarDay[] = [];
 
       for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month - 1, day);
-        date.setHours(12, 0, 0, 0);
+        const date = new Date(Date.UTC(year, month - 1, day));
         const dateStr = date.toISOString().split("T")[0];
 
-        if (date.getMonth() !== month - 1) continue;
-
-        const holidayInfo = currentYearHolidays.find((h: any) => {
+        const holidayInfo = currentYearHolidays.find((h: Holiday) => {
           const holidayDate = new Date(h.date);
           return (
-            holidayDate.getUTCFullYear() === date.getFullYear() &&
-            holidayDate.getUTCMonth() === date.getMonth() &&
-            holidayDate.getUTCDate() === date.getDate()
+            holidayDate.getUTCFullYear() === date.getUTCFullYear() &&
+            holidayDate.getUTCMonth() === date.getUTCMonth() &&
+            holidayDate.getUTCDate() === date.getUTCDate()
           );
         });
 
         const isHoliday = !!holidayInfo;
-        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+        const isWeekend = date.getUTCDay() === 0 || date.getUTCDay() === 6;
 
-        const attendances: { [key: string]: any } = {};
+        const attendances: { [key: string]: CalendarAttendance } = {};
 
         users.forEach((user) => {
           const dayAttendance = user.attendances.find((att) => {
             const attDate = new Date(att.date);
             return (
-              attDate.getFullYear() === date.getFullYear() &&
-              attDate.getMonth() === date.getMonth() &&
-              attDate.getDate() === date.getDate()
+              attDate.getUTCFullYear() === date.getUTCFullYear() &&
+              attDate.getUTCMonth() === date.getUTCMonth() &&
+              attDate.getUTCDate() === date.getUTCDate()
             );
           });
 
@@ -119,10 +120,10 @@ export default function Calendar({
         const dateAttendances = attendancesRes.data.flatMap((user: User) =>
           user.attendances
             .filter(
-              (att: any) =>
+              (att: Attendance) =>
                 new Date(att.date).toISOString().split("T")[0] === dateStr,
             )
-            .map((att: any) => ({ ...att, username: user.username })),
+            .map((att: Attendance) => ({ ...att, username: user.username })),
         );
         onDateClick?.(dateStr, dateAttendances);
       }
@@ -196,9 +197,9 @@ export default function Calendar({
 
           {calendarData.map((day) => {
             const date = new Date(day.date);
-            const dayOfMonth = date.getDate();
+            const dayOfMonth = date.getUTCDate();
             const presentCount = Object.values(day.attendances).filter(
-              (a: any) => a.present,
+              (a: CalendarAttendance) => a.present,
             ).length;
             const totalCount = Object.values(day.attendances).length;
 

@@ -30,7 +30,7 @@ export default function FieldTripModal({
 
         if (response.success && response.data?.fieldTrips) {
           setFieldTrips(
-            response.data.fieldTrips.map((trip: any) => ({
+            response.data.fieldTrips.map((trip: FieldTrip) => ({
               startDate: trip.startDate.split("T")[0],
               endDate: trip.endDate.split("T")[0],
               description: trip.description || "",
@@ -192,7 +192,9 @@ export default function FieldTripModal({
                     {fieldTrips.map((trip, index) => (
                       <div
                         key={index}
-                        className={`field-trip-item ${isCurrentlyOnTrip(trip) ? "active" : ""}`}
+                        className={`field-trip-item ${
+                          isCurrentlyOnTrip(trip) ? "active" : ""
+                        }`}
                       >
                         <div className="field-trip-item-info">
                           <span className="field-trip-item-date">

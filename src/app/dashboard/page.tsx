@@ -6,7 +6,7 @@ import { api } from "../../utils/api";
 import AttendanceTable from "../../components/AttendanceTable";
 import Calendar from "../../components/Calendar";
 import Modal from "../../components/Modal";
-import type { ApiResponse, User } from "../../types";
+import type { ApiResponse, User, UserAttendance } from "../../types";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -21,7 +21,7 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState<string | undefined>(
     undefined,
   );
-  const [dateAttendances, setDateAttendances] = useState<any[]>([]);
+  const [dateAttendances, setDateAttendances] = useState<UserAttendance[]>([]);
 
   const loadData = useCallback(async () => {
     if (!user) return;
@@ -63,7 +63,7 @@ export default function Dashboard() {
     return () => clearInterval(pollInterval);
   }, [user, loadData]);
 
-  const handleDateSelect = (date: string, attendances: any[]) => {
+  const handleDateSelect = (date: string, attendances: UserAttendance[]) => {
     setSelectedDate(date);
     setDateAttendances(attendances);
   };

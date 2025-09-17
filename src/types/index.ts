@@ -1,5 +1,3 @@
-// src/app/types/index.ts
-
 export interface Photo {
   url: string;
   type?: string;
@@ -10,7 +8,6 @@ export interface Audio {
   duration?: number;
 }
 
-// src/app/types/index.ts - Updated Attendance type
 export interface Attendance {
   date: string;
   checkinTime: string;
@@ -38,12 +35,10 @@ export interface Attendance {
     address?: string | null;
   };
 
-  // Computed properties for UI
   isCheckedOut?: boolean;
   isFullDay?: boolean;
   isHalfDay?: boolean;
 
-  // Added optional username for extended use
   username?: string;
 }
 
@@ -87,17 +82,27 @@ export interface ApiResponse {
   data: User[];
 }
 
+export interface Holiday {
+  date: string;
+  description: string;
+  isWeekend: boolean;
+  dayOfWeek: string;
+  month: string;
+}
+
+export interface CalendarAttendance {
+  present: boolean;
+  type: "FULL_DAY" | "HALF_DAY" | "IN_PROGRESS" | "ABSENT";
+  username: string;
+}
+
 export interface CalendarDay {
   date: string;
   isHoliday: boolean;
   isWeekend: boolean;
   description?: string;
   attendances: {
-    [employeeNumber: string]: {
-      present: boolean;
-      type: "FULL_DAY" | "HALF_DAY" | "IN_PROGRESS";
-      username: string;
-    };
+    [employeeNumber: string]: CalendarAttendance;
   };
 }
 
@@ -106,7 +111,7 @@ export interface AuthUser {
   projectCode: string;
   projects: string[];
   token: string;
-  isSSO?: boolean; // Add this
+  isSSO?: boolean;
 }
 
 export type DebugInfo = {
@@ -126,3 +131,7 @@ export type DebugInfo = {
   error?: unknown;
   token?: string | null;
 };
+
+export interface UserAttendance extends Attendance {
+  username: string;
+}
