@@ -265,7 +265,6 @@ export default function AttendanceTable({
                 employeeNumber,
                 fieldTrips,
               );
-              alert("Field trips saved successfully!");
             } catch (error) {
               console.error("Error saving field trips:", error);
               alert("Failed to save field trips.");

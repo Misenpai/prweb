@@ -725,14 +725,6 @@ body {
     box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
 }
 
-.static-year {
-    cursor: default;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 120px;
-}
-
 .card {
     background-color: white;
     padding: 1.5rem;
@@ -979,7 +971,17 @@ th {
     display: flex;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.static-year {
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    white-space: nowrap; /* Prevent text wrapping inside */
 }
 
 .loading-screen {
@@ -1219,7 +1221,15 @@ th {
         display: flex;
         gap: 1rem;
         margin-bottom: 1.5rem;
-        flex-wrap: wrap;
+        flex-wrap: nowrap; /* Changed from wrap to nowrap */
+        align-items: center; /* Add this to vertically align items */
+    }
+
+    /* Add a media query to handle smaller screens */
+    @media (max-width: 640px) {
+        .dashboard-filters {
+            flex-wrap: wrap; /* Allow wrapping only on small screens */
+        }
     }
 
     .calendar-header {

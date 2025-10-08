@@ -53,7 +53,6 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-content">
-      {/* This container uses flexbox to align children in a row */}
       <div className="dashboard-filters">
         <select
           value={filters.month}
@@ -64,12 +63,12 @@ export default function Dashboard() {
         >
           {Array.from({ length: 12 }, (_, i) => (
             <option key={i + 1} value={i + 1}>
-              {new Date(0, i).toLocaleString("en-US", { month: "long" })}
+              {new Date(0, i).toLocaleDateString("en-US", { month: "long" })}
             </option>
           ))}
         </select>
 
-        {/* This div will appear next to the select dropdown */}
+        {/* The year is now displayed as static text instead of a dropdown */}
         <div className="select-brutal static-year">{filters.year}</div>
       </div>
 
