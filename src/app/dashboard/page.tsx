@@ -25,24 +25,11 @@ export default function Dashboard() {
 
   const loadData = useCallback(async () => {
     if (!user) return;
-
     setLoading(true);
     setError("");
-
     try {
-      let response;
-
-      if (user.isSSO) {
-        response = await api.postWithSSO(
-          `/pi/users-attendance-sso?month=${filters.month}&year=${filters.year}`,
-          {},
-        );
-      } else {
-        response = await api.get(
-          `/pi/users-attendance?month=${filters.month}&year=${filters.year}`,
-        );
-      }
-
+      const endpoint = `/pi/users-attendance?month=${filters.month}&year=${filters.year}`;
+      const response = await api.get(endpoint);
       if (response.success) {
         setData(response);
       } else {

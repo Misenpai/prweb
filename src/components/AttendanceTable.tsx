@@ -76,7 +76,7 @@ export default function AttendanceTable({
             <tr>
               <th>Employee Number</th>
               <th>Username</th>
-              <th>Class</th>
+              {/*<th>Class</th>*/}
               <th>Projects</th>
               <th>Monthly Stats</th>
               <th>Field Trip Status</th>
@@ -89,11 +89,14 @@ export default function AttendanceTable({
               <tr key={user.employeeNumber || index} className="user-row">
                 <td>{user.employeeNumber}</td>
                 <td>{user.username}</td>
-                <td>{user.empClass}</td>
+                {/*<td>{user.empClass}</td>*/}
                 <td>
                   <div className="project-list">
-                    {user.projects.map((p) => (
-                      <span key={p.projectCode} className="project-tag">
+                    {user.projects.map((p, pIndex) => (
+                      <span
+                        key={`${p.projectCode}-${pIndex}`}
+                        className="project-tag"
+                      >
                         {p.projectCode}
                       </span>
                     ))}
@@ -108,12 +111,12 @@ export default function AttendanceTable({
                     <span title="Half Days" className="stat-badge half-days">
                       {user.monthlyStatistics.halfDays}H
                     </span>
-                    <span
+                    {/*<span
                       title="Not Checked Out"
                       className="stat-badge not-checked"
                     >
                       {user.monthlyStatistics.notCheckedOut}NC
-                    </span>
+                    </span>*/}
                     <span title="Total Days" className="stat-badge total-days">
                       {user.monthlyStatistics.totalDays}T
                     </span>
@@ -176,7 +179,9 @@ export default function AttendanceTable({
                 {att.username}: Check-in{" "}
                 {new Date(att.checkinTime).toLocaleTimeString()},
                 {att.checkoutTime
-                  ? `Check-out ${new Date(att.checkoutTime).toLocaleTimeString()}`
+                  ? `Check-out ${new Date(
+                      att.checkoutTime,
+                    ).toLocaleTimeString()}`
                   : "No Check-out"}
               </li>
             ))}
