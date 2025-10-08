@@ -1,8 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { User, Holiday } from "../types";
+import { useState, useEffect, useCallback } from "react";
 import { api } from "../utils/api";
+import type { User, Holiday, Attendance } from "../types";
+
+interface CalendarDay {
+  date: string;
+  isHoliday: boolean;
+  isWeekend: boolean;
+  description?: string;
+  status: "present" | "absent" | "non-working" | null;
+}
 
 interface EmployeeCalendarModalProps {
   user: User;
@@ -11,163 +19,154 @@ interface EmployeeCalendarModalProps {
   onClose: () => void;
 }
 
-interface CalendarDay {
-  date: Date;
-  dayOfMonth: number;
-  status: "present" | "absent" | "holiday" | "weekend" | "empty";
-  description?: string;
-}
-
 export default function EmployeeCalendarModal({
   user,
   month,
   year,
   onClose,
 }: EmployeeCalendarModalProps) {
-  const [calendarDays, setCalendarDays] = useState<CalendarDay[]>([]);
+  const [calendarData, setCalendarData] = useState<CalendarDay[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const generateCalendar = useCallback(async () => {
-    setLoading(true);
+  const loadCalendarData = useCallback(async () => {
     try {
+      setLoading(true);
       const holidaysRes = await api.get(`/calendar/holidays?year=${year}`);
-      const holidays: Holiday[] = holidaysRes.success
+      const currentYearHolidays: Holiday[] = holidaysRes.success
         ? holidaysRes.holidays
         : [];
 
       const daysInMonth = new Date(year, month, 0).getDate();
-      const generatedDays: CalendarDay[] = [];
+      const calendarDays: CalendarDay[] = [];
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(Date.UTC(year, month - 1, day));
+        const dateStr = date.toISOString().split("T")[0]!;
 
-        const holidayInfo = holidays.find((h) => {
+        const holidayInfo = currentYearHolidays.find((h: Holiday) => {
           const holidayDate = new Date(h.date);
-          return (
-            holidayDate.getUTCFullYear() === date.getUTCFullYear() &&
-            holidayDate.getUTCMonth() === date.getUTCMonth() &&
-            holidayDate.getUTCDate() === date.getUTCDate()
-          );
+          return holidayDate.toISOString().split("T")[0] === dateStr;
         });
 
         const isHoliday = !!holidayInfo;
         const isWeekend = date.getUTCDay() === 0 || date.getUTCDay() === 6;
 
-        const attendanceRecord = user.attendances.find((att) => {
+        const attendance = user.attendances.find((att: Attendance) => {
           const attDate = new Date(att.date);
-          return (
-            attDate.getUTCFullYear() === date.getUTCFullYear() &&
-            attDate.getUTCMonth() === date.getUTCMonth() &&
-            attDate.getUTCDate() === date.getUTCDate()
-          );
+          return attDate.toISOString().split("T")[0] === dateStr;
         });
 
-        let status: CalendarDay["status"] = "absent";
-        if (attendanceRecord) {
+        let status: CalendarDay["status"] = null;
+        if (attendance) {
           status = "present";
-        } else if (isHoliday) {
-          status = "holiday";
-        } else if (isWeekend) {
-          status = "weekend";
+        } else if (!isHoliday && !isWeekend && date <= today) {
+          status = "absent";
+        } else if (isHoliday || isWeekend) {
+          status = "non-working";
         }
 
-        generatedDays.push({
-          date,
-          dayOfMonth: day,
-          status,
+        calendarDays.push({
+          date: dateStr,
+          isHoliday,
+          isWeekend,
           description: holidayInfo?.description,
+          status,
         });
       }
 
-      setCalendarDays(generatedDays);
+      setCalendarData(calendarDays);
     } catch (error) {
-      console.error("Failed to generate calendar", error);
+      console.error("Error loading calendar data:", error);
     } finally {
       setLoading(false);
     }
-  }, [month, year, user.attendances]);
+  }, [month, year, user]);
 
   useEffect(() => {
-    generateCalendar();
-  }, [generateCalendar]);
+    loadCalendarData();
+  }, [loadCalendarData]);
 
   const getDayClass = (day: CalendarDay) => {
-    const classes =
-      "calendar-day min-h-20 flex items-center justify-center text-lg";
-    switch (day.status) {
-      case "present":
-        return `${classes} bg-green-100`;
-      case "absent":
-        return `${classes} bg-red-100`;
-      case "holiday":
-        return `${classes} bg-yellow-50`;
-      case "weekend":
-        return `${classes} bg-gray-100`;
-      case "empty":
-        return `${classes} empty`;
-      default:
-        return classes;
+    let classes = "calendar-day";
+    if (day.isHoliday) classes += " holiday";
+    if (day.isWeekend) classes += " weekend";
+    if (day.status === "present") classes += " present";
+    if (day.status === "absent") classes += " absent";
+    return classes;
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).classList.contains("modal-backdrop")) {
+      onClose();
     }
   };
+
+  if (loading) {
+    return (
+      <div className="modal-backdrop" onClick={handleBackdropClick}>
+        <div className="modal-container">
+          <div className="modal-header">
+            <h2>{user.username} - Current Month Calendar</h2>
+            <button className="close-btn" onClick={onClose}>
+              ×
+            </button>
+          </div>
+          <div className="p-6">
+            <div className="loading">Loading calendar...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const firstDayOfMonth = new Date(year, month - 1, 1).getDay();
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-backdrop" onClick={handleBackdropClick}>
+      <div className="modal-container">
         <div className="modal-header">
-          <h2 className="modal-title">
-            {user.username}&apos;s Monthly Attendance
-          </h2>
+          <h2>{user.username} - Monthly Calendar</h2>
           <button className="close-btn" onClick={onClose}>
-            &times;
+            ×
           </button>
         </div>
-        <div className="modal-body p-6">
-          <div className="calendar">
-            <div className="calendar-header justify-between">
-              <h3 className="text-xl font-bold">
-                {new Date(year, month - 1).toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                })}
-              </h3>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-green-100 border border-black"></div>{" "}
-                  Present
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-red-100 border border-black"></div>{" "}
-                  Absent
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-gray-100 border border-black"></div>{" "}
-                  Weekend
-                </div>
-              </div>
+        <div className="p-6">
+          <div className="calendar-grid">
+            <div className="calendar-weekdays">
+              <div>Sun</div>
+              <div>Mon</div>
+              <div>Tue</div>
+              <div>Wed</div>
+              <div>Thu</div>
+              <div>Fri</div>
+              <div>Sat</div>
             </div>
-
-            {loading ? (
-              <div className="loading-content">Loading Calendar...</div>
-            ) : (
-              <div className="calendar-grid mt-4">
-                <div className="calendar-weekdays">
-                  <div>Sun</div> <div>Mon</div> <div>Tue</div> <div>Wed</div>{" "}
-                  <div>Thu</div> <div>Fri</div> <div>Sat</div>
-                </div>
-                <div className="calendar-days">
-                  {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-                    <div key={`empty-${i}`} className="calendar-day empty" />
-                  ))}
-                  {calendarDays.map((day) => (
-                    <div key={day.dayOfMonth} className={getDayClass(day)}>
-                      <span className="font-bold">{day.dayOfMonth}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="calendar-days">
+              {Array.from({ length: firstDayOfMonth }, (_, i) => (
+                <div key={`empty-${i}`} className="calendar-day empty" />
+              ))}
+              {calendarData.map((day) => {
+                const dateObj = new Date(day.date);
+                const dayOfMonth = dateObj.getUTCDate();
+                return (
+                  <div key={day.date} className={getDayClass(day)}>
+                    <div className="day-number">{dayOfMonth}</div>
+                    {day.description && (
+                      <div className="day-holiday">{day.description}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="calendar-legend mt-4 flex flex-wrap gap-2">
+            <span className="legend-item all-present">Present</span>
+            <span className="legend-item mostly-absent">Absent</span>
+            <span className="legend-item holiday">Holiday</span>
+            <span className="legend-item weekend">Weekend</span>
           </div>
         </div>
       </div>

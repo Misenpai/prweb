@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import FieldTripModal from "./FieldTripModel";
 import EmployeeCalendarModal from "./EmployeeCalendarModal";
+
 import type { ApiResponse, User, FieldTrip, Attendance } from "../types";
 
 interface AttendanceTableProps {
@@ -26,9 +27,12 @@ export default function AttendanceTable({
     null,
   );
   const [calendarModalUser, setCalendarModalUser] = useState<User | null>(null);
+
+  // --- New state for search functionality ---
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
 
+  // --- useEffect to filter users when search query or data changes ---
   useEffect(() => {
     if (data?.data) {
       const lowercasedQuery = searchQuery.toLowerCase().trim();
@@ -56,6 +60,7 @@ export default function AttendanceTable({
     });
   };
 
+  // --- Loading state ---
   if (loading) {
     return (
       <div className="users-table">
@@ -67,6 +72,7 @@ export default function AttendanceTable({
     );
   }
 
+  // --- Error state ---
   if (error) {
     return (
       <div className="users-table">
@@ -78,6 +84,7 @@ export default function AttendanceTable({
     );
   }
 
+  // --- No data state ---
   if (!data || !data.data) {
     return (
       <div className="users-table">
@@ -91,6 +98,7 @@ export default function AttendanceTable({
 
   return (
     <>
+      {/* --- Daily Attendance (if a date is selected) --- */}
       {selectedDate && dateAttendances && dateAttendances.length > 0 && (
         <div className="users-table mb-6">
           <div className="table-header">
@@ -147,9 +155,11 @@ export default function AttendanceTable({
         </div>
       )}
 
+      {/* --- Main Attendance Table --- */}
       <div className="users-table">
         <div className="table-header">
           <h2>Employee Attendance Records</h2>
+          {/* --- Search input and header info container --- */}
           <div className="flex items-center gap-4 flex-wrap">
             <div className="search-container">
               <input
@@ -178,7 +188,6 @@ export default function AttendanceTable({
               <th>Projects</th>
               <th>Monthly Stats</th>
               <th>Field Trip Status</th>
-              <th>Calendar View</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -230,18 +239,14 @@ export default function AttendanceTable({
                     </div>
                   </td>
 
-                  <td className="text-center">
-                    <button
-                      onClick={() => setCalendarModalUser(user)}
-                      title={`View ${user.username}'s calendar`}
-                      className="text-2xl cursor-pointer"
-                    >
-                      🗓️
-                    </button>
-                  </td>
-
                   <td>
                     <div className="action-buttons">
+                      <button
+                        className="calendar-btn ml-2"
+                        onClick={() => setCalendarModalUser(user)}
+                      >
+                        📅
+                      </button>
                       <button
                         className="view-btn"
                         onClick={() => onViewDetails(user)}
@@ -254,7 +259,7 @@ export default function AttendanceTable({
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="no-records-message">
+                <td colSpan={6} className="no-records-message">
                   No employees found matching your search.
                 </td>
               </tr>
@@ -262,6 +267,16 @@ export default function AttendanceTable({
           </tbody>
         </table>
       </div>
+
+      {/* --- Modals --- */}
+      {calendarModalUser && data && (
+        <EmployeeCalendarModal
+          user={calendarModalUser}
+          month={data.month}
+          year={data.year}
+          onClose={() => setCalendarModalUser(null)}
+        />
+      )}
 
       {fieldTripModalUser && (
         <FieldTripModal
@@ -279,15 +294,6 @@ export default function AttendanceTable({
               alert("Failed to save field trips.");
             }
           }}
-        />
-      )}
-
-      {calendarModalUser && data && (
-        <EmployeeCalendarModal
-          user={calendarModalUser}
-          month={data.month}
-          year={data.year}
-          onClose={() => setCalendarModalUser(null)}
         />
       )}
     </>

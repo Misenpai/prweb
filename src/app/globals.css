@@ -840,6 +840,14 @@ th {
     background-color: transparent;
 }
 
+.calendar-day.present {
+    background-color: #86efac; /* darker green */
+}
+
+.calendar-day.absent {
+    background-color: #fca5a5; /* darker red */
+}
+
 .calendar-header {
     display: flex;
     justify-content: space-between;
@@ -901,6 +909,19 @@ th {
 
 .legend-item.weekend {
     background-color: #f3f4f6;
+}
+
+.calendar-btn {
+    background: white;
+    border: 2px solid black;
+    padding: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+}
+
+.calendar-btn:hover {
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
 }
 
 .modal {
