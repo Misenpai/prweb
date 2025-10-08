@@ -725,6 +725,14 @@ body {
     box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
 }
 
+.static-year {
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+}
+
 .card {
     background-color: white;
     padding: 1.5rem;
@@ -772,6 +780,8 @@ th {
     background-color: #f9fafb;
 }
 
+/* Updated calendar styles - add to your existing globals.css */
+
 .calendar {
     background-color: white;
     padding: 1.5rem;
@@ -792,11 +802,12 @@ th {
 }
 
 .calendar-weekdays > div {
-    padding: 0.75rem;
+    padding: 0.5rem;
     border-right: 1px solid black;
     border-bottom: 1px solid black;
     text-align: center;
     font-weight: bold;
+    font-size: 0.875rem;
 }
 
 .calendar-days {
@@ -805,7 +816,7 @@ th {
 }
 
 .calendar-day {
-    min-height: 100px;
+    min-height: 70px;
     padding: 0.5rem;
     border-right: 1px solid #e5e7eb;
     border-bottom: 1px solid #e5e7eb;
@@ -813,15 +824,11 @@ th {
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
+    background-color: white;
 }
 
 .calendar-day:hover {
     background-color: #f9fafb;
-}
-
-.calendar-day.today {
-    background-color: #eff6ff;
-    border: 2px solid #3b82f6;
 }
 
 .calendar-day.holiday {
@@ -832,20 +839,43 @@ th {
     background-color: #f3f4f6;
 }
 
-.calendar-day.all-present {
-    background-color: #dcfce7;
+.calendar-day.empty {
+    background-color: transparent;
+    cursor: default;
 }
 
-.calendar-day.mostly-present {
-    background-color: #f0fdf4;
+.calendar-day.empty:hover {
+    background-color: transparent;
 }
 
-.calendar-day.some-present {
-    background-color: #fefce8;
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.calendar-day.mostly-absent {
-    background-color: #fef2f2;
+.day-number {
+    font-weight: bold;
+    font-size: 0.875rem;
+}
+
+.day-holiday {
+    font-size: 0.75rem;
+    color: #dc2626;
+    font-weight: 500;
+}
+
+.day-attendance {
+    font-size: 0.75rem;
+    background-color: #e5e7eb;
+    padding: 0.25rem;
+    margin-top: auto;
+    border: 1px solid #000;
+    border-radius: 0;
+    text-align: center;
 }
 
 .legend-item {
@@ -1150,39 +1180,10 @@ th {
 }
 
 /* Calendar specific styles */
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
 .calendar-legend {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-}
-
-.day-number {
-    font-weight: bold;
-    font-size: 0.875rem;
-}
-
-.day-holiday {
-    font-size: 0.75rem;
-    color: #dc2626;
-    font-weight: 500;
-}
-
-.day-attendance {
-    font-size: 0.75rem;
-    background-color: #e5e7eb;
-    padding: 0.25rem;
-    margin-top: auto;
-    border: 1px solid #000;
-    border-radius: 0;
 }
 
 /* Responsive styles */
@@ -1206,11 +1207,19 @@ th {
     }
 
     .calendar-day {
-        min-height: 80px;
+        min-height: 60px;
+        font-size: 0.75rem;
+    }
+
+    .day-number {
+        font-size: 0.75rem;
     }
 
     .dashboard-filters {
-        flex-direction: column;
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
     }
 
     .calendar-header {
@@ -1640,16 +1649,6 @@ header {
     cursor: pointer;
     font-weight: bold;
     border: 2px solid black;
-}
-
-/* Calendar day empty state */
-.calendar-day.empty {
-    background-color: transparent;
-    cursor: default;
-}
-
-.calendar-day.empty:hover {
-    background-color: transparent;
 }
 
 /* Pre and code styles for debug info */

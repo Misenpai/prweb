@@ -138,19 +138,6 @@ export default function Calendar({
     if (day.isHoliday) classes += " holiday";
     if (day.isWeekend) classes += " weekend";
 
-    const attendanceCount = Object.values(day.attendances).length;
-    const presentCount = Object.values(day.attendances).filter(
-      (a) => a.present,
-    ).length;
-
-    if (attendanceCount > 0) {
-      const presentRatio = presentCount / attendanceCount;
-      if (presentRatio === 1) classes += " all-present";
-      else if (presentRatio > 0.7) classes += " mostly-present";
-      else if (presentRatio > 0.3) classes += " some-present";
-      else classes += " mostly-absent";
-    }
-
     return classes;
   };
 
@@ -161,7 +148,10 @@ export default function Calendar({
   const firstDayOfMonth = new Date(year, month - 1, 1).getDay();
 
   return (
-    <div className="calendar">
+    <div
+      className="calendar"
+      style={{ maxWidth: "900px", margin: "0 auto", marginBottom: "30px" }}
+    >
       <div className="calendar-header">
         <h2>
           {new Date(year, month - 1).toLocaleDateString("en-US", {
@@ -169,14 +159,6 @@ export default function Calendar({
             year: "numeric",
           })}
         </h2>
-        <div className="calendar-legend">
-          <span className="legend-item all-present">All Present</span>
-          <span className="legend-item mostly-present">Mostly Present</span>
-          <span className="legend-item some-present">Some Present</span>
-          <span className="legend-item mostly-absent">Mostly Absent</span>
-          <span className="legend-item holiday">Holiday</span>
-          <span className="legend-item weekend">Weekend</span>
-        </div>
       </div>
 
       <div className="calendar-grid">

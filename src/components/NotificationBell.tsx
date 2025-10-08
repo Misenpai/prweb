@@ -61,7 +61,7 @@ export default function NotificationBell() {
 
       {isOpen && (
         <div className="notification-dropdown">
-          <div className="notification-header">HR Data Requests</div>
+          <div className="notification-header">HR Attendance Requests</div>
           {notifications.length > 0 ? (
             notifications.map((notif, index) => (
               <div key={index} className="notification-item">

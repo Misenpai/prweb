@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [modalData, setModalData] = useState<User | null>(null);
   const [filters, setFilters] = useState({
     month: new Date().getMonth() + 1,
-    year: new Date().getFullYear(),
+    year: new Date().getFullYear(), // Year is set to the current year
   });
   const [selectedDate, setSelectedDate] = useState<string | undefined>(
     undefined,
@@ -42,14 +42,6 @@ export default function Dashboard() {
     }
   }, [user, filters.month, filters.year]);
 
-  useEffect(() => {
-    const pollInterval = setInterval(() => {
-      if (user) loadData();
-    }, 30000);
-
-    return () => clearInterval(pollInterval);
-  }, [user, loadData]);
-
   const handleDateSelect = (date: string, attendances: UserAttendance[]) => {
     setSelectedDate(date);
     setDateAttendances(attendances);
@@ -61,6 +53,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-content">
+      {/* This container uses flexbox to align children in a row */}
       <div className="dashboard-filters">
         <select
           value={filters.month}
@@ -71,25 +64,13 @@ export default function Dashboard() {
         >
           {Array.from({ length: 12 }, (_, i) => (
             <option key={i + 1} value={i + 1}>
-              {new Date(0, i).toLocaleDateString("en-US", { month: "long" })}
+              {new Date(0, i).toLocaleString("en-US", { month: "long" })}
             </option>
           ))}
         </select>
 
-        <select
-          value={filters.year}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, year: parseInt(e.target.value) }))
-          }
-          className="select-brutal"
-        >
-          <option value="2025">2025</option>
-          <option value="2024">2024</option>
-        </select>
-
-        <button onClick={loadData} className="btn-brutal">
-          Refresh
-        </button>
+        {/* This div will appear next to the select dropdown */}
+        <div className="select-brutal static-year">{filters.year}</div>
       </div>
 
       <Calendar
