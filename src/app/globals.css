@@ -754,7 +754,7 @@ th,
 td {
     padding: 1rem;
     border-bottom: 1px solid #e5e7eb;
-    text-align: left;
+    text-align: center;
     color: black;
 }
 
@@ -1126,6 +1126,7 @@ th {
     display: flex;
     flex-wrap: wrap;
     gap: 0.25rem;
+    justify-content: center;
 }
 
 .project-tag {
@@ -1141,13 +1142,14 @@ th {
 .monthly-stats {
     display: flex;
     gap: 0.25rem;
+    justify-content: center;
 }
 
 .field-trip-status {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .action-buttons {

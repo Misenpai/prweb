@@ -162,12 +162,6 @@ export default function EmployeeCalendarModal({
               })}
             </div>
           </div>
-          <div className="calendar-legend mt-4 flex flex-wrap gap-2">
-            <span className="legend-item all-present">Present</span>
-            <span className="legend-item mostly-absent">Absent</span>
-            <span className="legend-item holiday">Holiday</span>
-            <span className="legend-item weekend">Weekend</span>
-          </div>
         </div>
       </div>
     </div>
