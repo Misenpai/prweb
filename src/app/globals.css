@@ -1543,6 +1543,7 @@ table {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    margin-right: 20px;
 }
 
 .form-row {
@@ -1742,4 +1743,12 @@ pre {
     .calendar-legend {
         justify-content: center;
     }
+}
+
+.text-blue-800 {
+    color: #1e40af;
+}
+
+.text-green-800 {
+    color: #166534;
 }

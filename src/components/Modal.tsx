@@ -12,22 +12,55 @@ export default function Modal({
   user,
   onClose,
 }: ModalProps): React.JSX.Element {
+  // --- State for filters ---
   const [searchDate, setSearchDate] = useState<string>("");
+  const [modeFilter, setModeFilter] = useState<string>("ALL");
+  const [typeFilter, setTypeFilter] = useState<string>("ALL");
   const [filteredAttendances, setFilteredAttendances] = useState(
     user.attendances,
   );
 
   useEffect(() => {
+    let filtered = user.attendances;
+
+    // Filter by date
     if (searchDate) {
-      const filtered = user.attendances.filter((att) => {
+      filtered = filtered.filter((att) => {
         const attDate = new Date(att.date).toISOString().split("T")[0];
         return attDate === searchDate;
       });
-      setFilteredAttendances(filtered);
-    } else {
-      setFilteredAttendances(user.attendances);
     }
-  }, [searchDate, user.attendances]);
+
+    // Robust filtering for Mode
+    if (modeFilter !== "ALL") {
+      filtered = filtered.filter((att) => {
+        const isFieldTrip =
+          att.locationType === "FIELDTRIP" ||
+          (att.takenLocation &&
+            att.takenLocation.toLowerCase().includes("field trip"));
+
+        if (modeFilter === "FIELDTRIP") {
+          return isFieldTrip;
+        }
+        if (modeFilter === "CAMPUS") {
+          return !isFieldTrip;
+        }
+        return false;
+      });
+    }
+
+    // Filter by type
+    if (typeFilter !== "ALL") {
+      filtered = filtered.filter((att) => {
+        if (typeFilter === "FULL_DAY") return att.isFullDay;
+        if (typeFilter === "HALF_DAY") return att.isHalfDay;
+        if (typeFilter === "IN_PROGRESS") return !att.isCheckedOut;
+        return false;
+      });
+    }
+
+    setFilteredAttendances(filtered);
+  }, [searchDate, modeFilter, typeFilter, user.attendances]);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     if ((e.target as HTMLElement).classList.contains("modal-backdrop")) {
@@ -54,6 +87,15 @@ export default function Modal({
     if (att.isHalfDay) return "#17a2b8";
     return "#6c757d";
   };
+
+  const clearFilters = () => {
+    setSearchDate("");
+    setModeFilter("ALL");
+    setTypeFilter("ALL");
+  };
+
+  const areFiltersActive =
+    searchDate !== "" || modeFilter !== "ALL" || typeFilter !== "ALL";
 
   return (
     <div className="modal-backdrop" onClick={handleBackdropClick}>
@@ -107,19 +149,49 @@ export default function Modal({
             Attendance Records
           </h3>
 
-          <div className="search-container flex items-center gap-2">
-            <label htmlFor="dateSearch">Filter by Date:</label>
-            <input
-              id="dateSearch"
-              type="date"
-              value={searchDate}
-              onChange={(e) => setSearchDate(e.target.value)}
-              className="date-search-input flex-grow p-3 border border-gray-300 rounded-md text-base"
-            />
-            {searchDate && (
+          {/* --- Filters Section --- */}
+          <div className="search-container flex items-end gap-6 flex-wrap">
+            <div className="form-group">
+              <label htmlFor="dateSearch">Filter by Date:</label>
+              <input
+                id="dateSearch"
+                type="date"
+                value={searchDate}
+                onChange={(e) => setSearchDate(e.target.value)}
+                className="date-search-input p-3 border border-gray-300 rounded-md text-base w-full"
+              />
+            </div>
+            <div className="form-group flex-grow">
+              <label htmlFor="modeFilter">Filter by Mode:</label>
+              <select
+                id="modeFilter"
+                value={modeFilter}
+                onChange={(e) => setModeFilter(e.target.value)}
+                className="date-search-input p-3 border border-gray-300 rounded-md text-base w-full"
+              >
+                <option value="ALL">All Modes</option>
+                <option value="CAMPUS">Campus</option>
+                <option value="FIELDTRIP">Field Trip</option>
+              </select>
+            </div>
+            <div className="form-group flex-grow">
+              <label htmlFor="typeFilter">Filter by Type:</label>
+              <select
+                id="typeFilter"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="date-search-input p-3 border border-gray-300 rounded-md text-base w-full"
+              >
+                <option value="ALL">All Types</option>
+                <option value="FULL_DAY">Full Day</option>
+                <option value="HALF_DAY">Half Day</option>
+                <option value="IN_PROGRESS">In Progress</option>
+              </select>
+            </div>
+            {areFiltersActive && (
               <button
                 className="clear-search-btn p-3 bg-gray-500 text-white border-none rounded-md cursor-pointer text-base transition-colors duration-200 hover:bg-gray-600"
-                onClick={() => setSearchDate("")}
+                onClick={clearFilters}
               >
                 Clear
               </button>
@@ -128,8 +200,7 @@ export default function Modal({
 
           {filteredAttendances.length === 0 ? (
             <p className="no-records-message text-center text-gray-500 italic p-8">
-              No attendance records found{" "}
-              {searchDate ? "for the selected date" : "for this month"}.
+              No attendance records found matching the current filters.
             </p>
           ) : (
             <div className="attendance-list flex flex-col gap-6">
@@ -138,6 +209,12 @@ export default function Modal({
                 const checkOutDate = att.checkoutTime
                   ? new Date(att.checkoutTime)
                   : null;
+
+                // --- MODIFIED: Robust display logic for Mode ---
+                const isFieldTrip =
+                  att.locationType === "FIELDTRIP" ||
+                  (att.takenLocation &&
+                    att.takenLocation.toLowerCase().includes("field trip"));
 
                 return (
                   <div
@@ -157,9 +234,10 @@ export default function Modal({
                         <div className="detail-item flex-1 min-w-[200px]">
                           <strong>Session:</strong>
                           <span
-                            className="badge text-white py-1 px-2.5 rounded-full text-sm font-medium ml-2 inline-block"
+                            className="status-badge"
                             style={{
                               backgroundColor: getSessionColor(att.sessionType),
+                              color: "white",
                             }}
                           >
                             {att.sessionType || "N/A"}
@@ -168,9 +246,10 @@ export default function Modal({
                         <div className="detail-item flex-1 min-w-[200px]">
                           <strong>Type:</strong>
                           <span
-                            className="badge text-white py-1 px-2.5 rounded-full text-sm font-medium ml-2 inline-block"
+                            className="status-badge"
                             style={{
                               backgroundColor: getAttendanceTypeColor(att),
+                              color: "white",
                             }}
                           >
                             {getAttendanceTypeLabel(att)}
@@ -191,21 +270,35 @@ export default function Modal({
                       </div>
                       <div className="detail-row flex justify-between flex-wrap gap-4">
                         <div className="detail-item flex-1 min-w-[200px]">
-                          <strong>Location:</strong>{" "}
-                          <span>
-                            {att.location?.address || "Not specified"}
+                          <strong>Mode:</strong>
+                          <span
+                            className={`status-badge ${
+                              isFieldTrip
+                                ? "bg-green-100 text-green-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {isFieldTrip ? "Field Trip" : "Campus"}
                           </span>
                         </div>
                         <div className="detail-item flex-1 min-w-[200px]">
                           <strong>Status:</strong>
                           <span
-                            className={`status-badge py-1 px-2.5 rounded-full text-sm font-semibold ml-2 ${
+                            className={`status-badge ${
                               att.isCheckedOut
                                 ? "bg-green-500 text-white"
                                 : "bg-yellow-400 text-gray-800"
                             }`}
                           >
                             {att.isCheckedOut ? "Completed" : "In Progress"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="detail-row flex justify-between flex-wrap gap-4">
+                        <div className="detail-item flex-1 min-w-[200px]">
+                          <strong>Location:</strong>{" "}
+                          <span>
+                            {att.location?.address || "Not specified"}
                           </span>
                         </div>
                       </div>
