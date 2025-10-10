@@ -1,4 +1,19 @@
+// src/utils/api.ts
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+
+interface ApiResponse<T = any> {
+  success: boolean;
+  error?: string;
+  message?: string;
+  data?: T;
+  // Additional fields for specific responses
+  month?: number;
+  year?: number;
+  totalUsers?: number;
+  submittedCount?: number;
+  totalCount?: number;
+}
 
 export class ApiClient {
   private getHeaders() {
@@ -24,14 +39,17 @@ export class ApiClient {
     return headers;
   }
 
-  async get(endpoint: string) {
+  async get<T = any>(endpoint: string): Promise<ApiResponse<T>> {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       headers: this.getHeaders(),
     });
     return response.json();
   }
 
-  async post(endpoint: string, data: unknown) {
+  async post<T = any>(
+    endpoint: string,
+    data: unknown,
+  ): Promise<ApiResponse<T>> {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method: "POST",
       headers: this.getHeaders(),
@@ -40,7 +58,7 @@ export class ApiClient {
     return response.json();
   }
 
-  async put(endpoint: string, data: unknown) {
+  async put<T = any>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method: "PUT",
       headers: this.getHeaders(),
@@ -49,7 +67,10 @@ export class ApiClient {
     return response.json();
   }
 
-  async postWithSSO(endpoint: string, data: Record<string, unknown>) {
+  async postWithSSO(
+    endpoint: string,
+    data: Record<string, unknown>,
+  ): Promise<ApiResponse> {
     const ssoUser = localStorage.getItem("sso_user");
     let body = data;
 
