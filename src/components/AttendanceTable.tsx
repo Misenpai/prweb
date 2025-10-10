@@ -60,6 +60,26 @@ export default function AttendanceTable({
     });
   };
 
+  // --- Function to get absent employees for selected date ---
+  const getAbsentEmployees = () => {
+    if (!selectedDate || !data?.data) return [];
+
+    const presentUsernames = new Set(
+      dateAttendances?.map((att) => att.username) || [],
+    );
+
+    // Check if selected date is a holiday or weekend
+    const date = new Date(selectedDate);
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+    // Filter users who don't have attendance on the selected date
+    // and exclude weekends (unless you want to show them)
+    return data.data.filter((user) => {
+      const hasAttendance = presentUsernames.has(user.username);
+      return !hasAttendance && !isWeekend;
+    });
+  };
+
   // --- Loading state ---
   if (loading) {
     return (
@@ -95,6 +115,8 @@ export default function AttendanceTable({
       </div>
     );
   }
+
+  const absentEmployees = getAbsentEmployees();
 
   return (
     <>
@@ -154,6 +176,99 @@ export default function AttendanceTable({
           </div>
         </div>
       )}
+
+      {/* --- Absent Employees Section --- */}
+      {selectedDate && absentEmployees.length > 0 && (
+        <div className="users-table mb-6">
+          <div className="table-header">
+            <h2 className="text-red-600">
+              Absent Employees on{" "}
+              {new Date(selectedDate).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </h2>
+            <span className="text-red-600 font-bold">
+              Total Absent: {absentEmployees.length}
+            </span>
+          </div>
+          <div className="p-6">
+            <div className="overflow-x-auto">
+              <div
+                className="flex gap-4 pb-4"
+                style={{ minWidth: "fit-content" }}
+              >
+                {absentEmployees.map((user, idx) => (
+                  <div
+                    key={idx}
+                    className="card flex-shrink-0 bg-red-50"
+                    style={{ minWidth: "250px" }}
+                  >
+                    <div className="font-bold mb-3 pb-2 border-b-2 border-red-500">
+                      {user.username}
+                    </div>
+                    <div className="space-y-2">
+                      <div>
+                        <div className="font-bold text-sm mb-1">
+                          Employee Number:
+                        </div>
+                        <div className="text-gray-700">
+                          {user.employeeNumber}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-sm mb-1">Projects:</div>
+                        <div className="flex flex-wrap gap-1">
+                          {user.projects.map((p, pIndex) => (
+                            <span
+                              key={`${p.projectCode}-${pIndex}`}
+                              className="project-tag text-xs"
+                            >
+                              {p.projectCode}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="mt-3 pt-2 border-t border-red-300">
+                        <span className="status-badge bg-red-500 text-white text-xs">
+                          ABSENT
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Show message if no one is absent */}
+      {selectedDate &&
+        absentEmployees.length === 0 &&
+        dateAttendances &&
+        dateAttendances.length > 0 && (
+          <div className="users-table mb-6">
+            <div className="table-header">
+              <h2 className="text-green-600">
+                Absent Employees on{" "}
+                {new Date(selectedDate).toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </h2>
+            </div>
+            <div className="p-6">
+              <div className="text-center text-green-600 font-semibold">
+                🎉 No employees were absent on this day!
+              </div>
+            </div>
+          </div>
+        )}
 
       {/* --- Main Attendance Table --- */}
       <div className="users-table">
