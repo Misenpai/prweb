@@ -6,6 +6,7 @@ import { api } from "../utils/api";
 interface Notification {
   month: string;
   year: string;
+  message?: string;
 }
 
 export default function NotificationBell() {
@@ -50,6 +51,15 @@ export default function NotificationBell() {
     }
   };
 
+  const formatNotificationMessage = (notif: Notification) => {
+    const monthName = new Date(0, parseInt(notif.month) - 1).toLocaleString(
+      "en-US",
+      { month: "long" },
+    );
+    const message = notif.message || "Request for attendance data for";
+    return `${message}: ${monthName} ${notif.year}`;
+  };
+
   return (
     <div className="relative cursor-pointer">
       <span className="text-2xl text-black" onClick={() => setIsOpen(!isOpen)}>
@@ -66,14 +76,7 @@ export default function NotificationBell() {
             notifications.map((notif, index) => (
               <div key={index} className="notification-item">
                 <p className="mb-3 text-black">
-                  Request for attendance data for:{" "}
-                  <strong>
-                    {new Date(0, parseInt(notif.month) - 1).toLocaleString(
-                      "en-US",
-                      { month: "long" },
-                    )}{" "}
-                    {notif.year}
-                  </strong>
+                  {formatNotificationMessage(notif)}
                 </p>
                 <button
                   className="btn"
