@@ -28,11 +28,9 @@ export default function AttendanceTable({
   );
   const [calendarModalUser, setCalendarModalUser] = useState<User | null>(null);
 
-  // --- New state for search functionality ---
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
 
-  // --- useEffect to filter users when search query or data changes ---
   useEffect(() => {
     if (data?.data) {
       const lowercasedQuery = searchQuery.toLowerCase().trim();
@@ -60,7 +58,6 @@ export default function AttendanceTable({
     });
   };
 
-  // --- Function to get absent employees for selected date ---
   const getAbsentEmployees = () => {
     if (!selectedDate || !data?.data) return [];
 
@@ -68,19 +65,15 @@ export default function AttendanceTable({
       dateAttendances?.map((att) => att.username) || [],
     );
 
-    // Check if selected date is a holiday or weekend
     const date = new Date(selectedDate);
     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
-    // Filter users who don't have attendance on the selected date
-    // and exclude weekends (unless you want to show them)
     return data.data.filter((user) => {
       const hasAttendance = presentUsernames.has(user.username);
       return !hasAttendance && !isWeekend;
     });
   };
 
-  // --- Loading state ---
   if (loading) {
     return (
       <div className="users-table">
@@ -92,7 +85,6 @@ export default function AttendanceTable({
     );
   }
 
-  // --- Error state ---
   if (error) {
     return (
       <div className="users-table">
@@ -104,7 +96,6 @@ export default function AttendanceTable({
     );
   }
 
-  // --- No data state ---
   if (!data || !data.data) {
     return (
       <div className="users-table">
@@ -120,7 +111,7 @@ export default function AttendanceTable({
 
   return (
     <>
-      {/* --- Daily Attendance (if a date is selected) --- */}
+      {/* Daily Attendance Section */}
       {selectedDate && dateAttendances && dateAttendances.length > 0 && (
         <div className="users-table mb-6">
           <div className="table-header">
@@ -133,18 +124,37 @@ export default function AttendanceTable({
                 day: "numeric",
               })}
             </h2>
+            <span className="font-bold">
+              Total Present: {dateAttendances.length}
+            </span>
           </div>
           <div className="p-6">
-            <div className="overflow-x-auto">
+            <div
+              className="horizontal-scroll-container"
+              style={{
+                overflowX: "auto",
+                overflowY: "hidden",
+                width: "100%",
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
               <div
-                className="flex gap-4 pb-4"
-                style={{ minWidth: "fit-content" }}
+                style={{
+                  display: "flex",
+                  gap: "1rem",
+                  paddingBottom: "1rem",
+                  minWidth: "min-content",
+                }}
               >
                 {dateAttendances.map((att, idx) => (
                   <div
                     key={idx}
-                    className="card flex-shrink-0"
-                    style={{ minWidth: "250px" }}
+                    className="card"
+                    style={{
+                      minWidth: "250px",
+                      width: "250px",
+                      flexShrink: 0,
+                    }}
                   >
                     <div className="font-bold mb-3 pb-2 border-b-2 border-black">
                       {att.username}
@@ -177,12 +187,12 @@ export default function AttendanceTable({
         </div>
       )}
 
-      {/* --- Absent Employees Section --- */}
+      {/* Absent Employees Section */}
       {selectedDate && absentEmployees.length > 0 && (
         <div className="users-table mb-6">
           <div className="table-header">
-            <h2 className="text-red-600">
-              Absent Employees on{" "}
+            <h2>
+              Absent for{" "}
               {new Date(selectedDate).toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
@@ -190,21 +200,37 @@ export default function AttendanceTable({
                 day: "numeric",
               })}
             </h2>
-            <span className="text-red-600 font-bold">
+            <span className="font-bold">
               Total Absent: {absentEmployees.length}
             </span>
           </div>
           <div className="p-6">
-            <div className="overflow-x-auto">
+            <div
+              className="horizontal-scroll-container"
+              style={{
+                overflowX: "auto",
+                overflowY: "hidden",
+                width: "100%",
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
               <div
-                className="flex gap-4 pb-4"
-                style={{ minWidth: "fit-content" }}
+                style={{
+                  display: "flex",
+                  gap: "1rem",
+                  paddingBottom: "1rem",
+                  minWidth: "min-content",
+                }}
               >
                 {absentEmployees.map((user, idx) => (
                   <div
                     key={idx}
-                    className="card flex-shrink-0 bg-red-50"
-                    style={{ minWidth: "250px" }}
+                    className="card bg-red-50"
+                    style={{
+                      minWidth: "250px",
+                      width: "250px",
+                      flexShrink: 0,
+                    }}
                   >
                     <div className="font-bold mb-3 pb-2 border-b-2 border-red-500">
                       {user.username}
@@ -219,7 +245,9 @@ export default function AttendanceTable({
                         </div>
                       </div>
                       <div>
-                        <div className="font-bold text-sm mb-1">Projects:</div>
+                        <div className="font-bold text-sm mb-1">
+                          Project ID:
+                        </div>
                         <div className="flex flex-wrap gap-1">
                           {user.projects.map((p, pIndex) => (
                             <span
@@ -231,11 +259,6 @@ export default function AttendanceTable({
                           ))}
                         </div>
                       </div>
-                      <div className="mt-3 pt-2 border-t border-red-300">
-                        <span className="status-badge bg-red-500 text-white text-xs">
-                          ABSENT
-                        </span>
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -245,7 +268,6 @@ export default function AttendanceTable({
         </div>
       )}
 
-      {/* Show message if no one is absent */}
       {selectedDate &&
         absentEmployees.length === 0 &&
         dateAttendances &&
@@ -270,11 +292,10 @@ export default function AttendanceTable({
           </div>
         )}
 
-      {/* --- Main Attendance Table --- */}
+      {/* Main Attendance Table */}
       <div className="users-table">
         <div className="table-header">
           <h2>Employee Attendance Records</h2>
-          {/* --- Search input and header info container --- */}
           <div className="flex items-center gap-4 flex-wrap">
             <div className="search-container">
               <input
@@ -383,7 +404,6 @@ export default function AttendanceTable({
         </table>
       </div>
 
-      {/* --- Modals --- */}
       {calendarModalUser && data && (
         <EmployeeCalendarModal
           user={calendarModalUser}
